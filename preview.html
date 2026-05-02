@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Практичне заняття 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f4f4f4;
+            color: #222;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .block {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+
+        select {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .quote-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eef2f7;
+            border-left: 5px solid #555;
+            font-style: italic;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Практичне заняття №2</h1>
+
+    <!-- ========================================================= -->
+    <!--                       ЗАВДАННЯ 1                          -->
+    <!-- ========================================================= -->
+    <div class="block">
+        <h2>Завдання 1. Відображення даних про себе</h2>
+        <div id="personData"></div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                       ЗАВДАННЯ 2                          -->
+    <!-- ========================================================= -->
+    <div class="block">
+        <h2>Завдання 2. Цитати дня за категорією</h2>
+        <label for="categorySelect">Оберіть категорію:</label><br>
+        <select id="categorySelect">
+            <option value="">-- Оберіть категорію --</option>
+        </select>
+        <div id="quoteResult" class="quote-box">Цитата з'явиться тут після вибору категорії.</div>
+    </div>
+
+    <script>
+        // =========================================================
+        // СПІЛЬНИЙ ДОПОМІЖНИЙ КОМПОНЕНТ:
+        // Методичні вказівки вимагають fetch + JSON.parse().
+        // Оскільки fetch(...).json() автоматично парсить JSON,
+        // для дотримання умови свідомо використовуємо response.text()
+        // і далі JSON.parse() вручну.
+        // =========================================================
+        function fetchAndParseJSON(dataURI) {
+            return fetch(dataURI)
+                .then(response => response.text())
+                .then(textData => JSON.parse(textData))
+                .catch(error => {
+                    console.log("Помилка завантаження JSON:", error);
+                });
+        }
+
+        // =========================================================
+        // РЕАЛІЗАЦІЯ ЗАВДАННЯ 1
+        // =========================================================
+
+        const myInfoObject = {
+            surname: "Смирнов",
+            name: "Ілля",
+            patronymic: "Миколайович",
+            birthYear: 2006,
+            age: 19,
+            birthDay: "субота",
+            hobbies: ["аніме", "фільми", "серіали Marvel", "комп'ютерні технології", "ігри"]
+        };
+
+        const myInfoJSON = JSON.stringify(myInfoObject);
+        const myInfoDataURI = "data:application/json," + encodeURIComponent(myInfoJSON);
+
+        fetchAndParseJSON(myInfoDataURI)
+            .then(person => {
+                const container = document.getElementById("personData");
+
+                const fullName = document.createElement("h3");
+                fullName.textContent = `ПІБ: ${person.surname} ${person.name} ${person.patronymic}`;
+
+                const age = document.createElement("p");
+                age.textContent = `Вік: ${person.age} років`;
+
+                const birth = document.createElement("p");
+                birth.textContent = `Рік народження: ${person.birthYear}, народився у ${person.birthDay}`;
+
+                const hobbyTitle = document.createElement("p");
+                hobbyTitle.textContent = "Хобі:";
+
+                const hobbyList = document.createElement("ul");
+
+                person.hobbies.forEach(hobby => {
+                    const li = document.createElement("li");
+                    li.textContent = hobby;
+                    hobbyList.appendChild(li);
+                });
+
+                container.appendChild(fullName);
+                container.appendChild(age);
+                container.appendChild(birth);
+                container.appendChild(hobbyTitle);
+                container.appendChild(hobbyList);
+            });
+
+        // =========================================================
+        // РЕАЛІЗАЦІЯ ЗАВДАННЯ 2
+        // =========================================================
+
+        const quotesObject = {
+            "Аніме": "«Той, хто не розуміє справжнього болю, ніколи не зрозуміє справжнього миру.» — Наруто",
+            "Сім смертних гріхів": "«Навіть якщо весь світ відвернеться, я все одно стоятиму до кінця.» — Меліодас",
+            "Фільми": "«Чому ми падаємо? Щоб навчитися підійматися.» — Batman Begins",
+            "Сорвиголова": "«Іноді правосуддя вимагає більше, ніж просто закон.»",
+            "Залізний кулак": "«Справжня сила народжується з контролю над собою.»",
+            "Люк Кейдж": "«Неважливо, наскільки ти міцний, важливо — заради чого ти стоїш.»",
+            "Джессіка Джонс": "«Світ не стає кращим сам по собі — хтось має це робити.»",
+            "Захисники": "«Разом ми сильніші, ніж кожен окремо.»",
+            "Каратель": "«Минуле не відпускає, але воно може зробити тебе сильнішим.»",
+            "Месники": "«Що б не сталося завтра, ми зустрінемо це разом.»",
+            "Людина-павук": "«З великою силою приходить велика відповідальність.»",
+            "Marvel": "«Героями стають не через здібності, а через вибір.»",
+            "DC": "«Надія — це найсильніша зброя.»",
+            "Мотивація": "«Успіх приходить до тих, хто не зупиняється.»",
+            "Життя": "«Кожен день — це ще одна можливість змінити все.»",
+            "Дружба": "«Справжні друзі залишаються навіть у найтемніші часи.»"
+        };
+
+        const quotesJSON = JSON.stringify(quotesObject);
+        const quotesDataURI = "data:application/json," + encodeURIComponent(quotesJSON);
+
+        fetchAndParseJSON(quotesDataURI)
+            .then(quotes => {
+                const select = document.getElementById("categorySelect");
+                const result = document.getElementById("quoteResult");
+
+                for (let category in quotes) {
+                    const option = document.createElement("option");
+                    option.value = category;
+                    option.textContent = category;
+                    select.appendChild(option);
+                }
+
+                select.addEventListener("change", function () {
+                    const selectedCategory = this.value;
+
+                    if (selectedCategory && quotes[selectedCategory]) {
+                        result.textContent = quotes[selectedCategory];
+                    } else {
+                        result.textContent = "Цитата з'явиться тут після вибору категорії.";
+                    }
+                });
+            });
+
+    </script>
+
+</body>
+</html>
